@@ -46,7 +46,9 @@ $data = search("all", "updated_at desc", 10, $page * 10);
 
 for($i=0; $i < count($data); $i++) {
   echo "<p>";
-  echo $data[$i]["id"];
+  echo date("Y/m/d H:i:s", strtotime($data[$i]["_created_at"]));
+  echo "  ";
+  echo $data[$i]["_user_id"];
   echo "</p>";
   echo "<p>";
   echo htmlspecialchars($data[$i]["text"], ENT_QUOTES, 'UTF-8');
