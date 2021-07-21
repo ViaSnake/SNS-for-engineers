@@ -42,7 +42,7 @@ function search($id = "all", $orderby = null, $limit = null, $skip = null) {
 
 <?php
 
-$data = search("all", "updated_at desc", 10, $page * 10);
+$data = search("all", "_updated_at desc", 10, $page * 10);
 
 for($i=0; $i < count($data); $i++) {
   echo "<p>";
