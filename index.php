@@ -1,3 +1,34 @@
+<?php
+
+if(isset($_GET['page']) && $_GET['page'] > 0) {
+  $page = $_GET['page'];
+} else {
+  $page = 0;
+}
+
+function search($id = "all", $orderby = null, $limit = null, $skip = null) {
+  $api = 'https://versatileapi.herokuapp.com/api/text/' . $id;
+  if(!empty($orderby) && !parse_url($api, PHP_URL_QUERY)) {
+    $api .= '?$orderby=' . urlencode($orderby);
+  } elseif (!empty($orderby) && parse_url($api, PHP_URL_QUERY)) {
+    $api .= '&$orderby=' . urlencode($orderby);
+  }
+  if(!empty($limit) && !parse_url($api, PHP_URL_QUERY)) {
+    $api .= '?$limit=' . $limit;
+  } elseif (!empty($limit) && parse_url($api, PHP_URL_QUERY)) {
+    $api .= '&$limit=' . $limit;
+  }
+  if(!empty($skip) && !parse_url($api, PHP_URL_QUERY)) {
+    $api .= '?$skip=' . $skip;
+  } elseif (!empty($skip) && parse_url($api, PHP_URL_QUERY)) {
+    $api .= '&$skip=' . $skip;
+  }
+  $response = file_get_contents($api);
+  return json_decode($response, true);
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -10,17 +41,10 @@
 	<hr>
 
 <?php
-$api = "https://versatileapi.herokuapp.com/api/text/all";
-$json = file_get_contents($api);
-$data = json_decode($json, true);
-$page = -1;
 
-if(isset($_GET['page']) && $_GET['page'] > 0) {
-  $page = $_GET['page'];
-  $page = $page * -10;
-}
+$data = search("all", "updated_at desc", 10, $page * 10);
 
-for($i=count($data)+$page; $i > count($data)+$page-10; $i--) {
+for($i=0; $i < count($data); $i++) {
   echo "<p>";
   echo $data[$i]["id"];
   echo "</p>";
@@ -30,19 +54,18 @@ for($i=count($data)+$page; $i > count($data)+$page-10; $i--) {
   echo "<hr>";
 }
 
-$max_page = count($data);
-
-if($_GET['page'] > 0) {
-  echo "<a href=?page=".($_GET['page'] - 1).">前へ</a>";
+if($page > 0) {
+  echo "<a href=?page=".($page - 1).">前へ</a>";
 } else {
   echo "前へ";
 }
 
-if($_GET['page'] <= $max_page) {
-  echo "<a href=?page=".($_GET['page'] + 1).">次へ</a>";
+if($page >= 0) {
+  echo "<a href=?page=".($page + 1).">次へ</a>";
 } else {
   echo "次へ";
 }
+
 ?>
 
 </body>
